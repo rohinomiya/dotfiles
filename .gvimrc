@@ -2,7 +2,10 @@
 
 " カラー設定:
 "colorscheme blackdust
-colorscheme Lucius
+"colorscheme Lucius
+set background=dark
+colorscheme solarized
+"colorscheme zenburn
 
 " 日本語入力中にカーソルの色を変更する
 if has('multi_byte_ime') || has('xim')
@@ -19,7 +22,7 @@ set guioptions+=a
 "フォント設定
 "set guifont=MS_Gothic:h10:cSHIFTJIS
 "set guifont=Ricty:h14
-"set guifont=MeiryoKe_Console:h12
+set guifont=MeiryoKe_Console:h12
 
 " ウインドウの幅
 set columns=120

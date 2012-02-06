@@ -1,18 +1,21 @@
-" ======================
+"============================================================
 " vim configuration file
 "
 " Maintener: rohinomiya <rohinomiya@gmail.com>
-" Last Change: 23-Jan-2012.
+" Last Change: 2012/02/04 13:06:24.
 " README file is here:
 "
 " Sorry for writing some comments in Japanese, and I'll translate to English later.
-" ======================
+"============================================================
 
 " Use Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible               " be iMproved
 set viminfo+=!
 
+"============================================================
+" neobundle.vim
+"============================================================
 filetype plugin indent off     " required!
 
 if has('vim_starting')
@@ -21,23 +24,26 @@ if has('vim_starting')
 endif
 " let NeoBundle manage NeoBundle
 " required! 
-"NeoBundle 'Shougo/neobundle.vim'
+NeoBundle 'Shougo/neobundle.vim'
 " recommended to install
 NeoBundle 'Shougo/vimproc'
+
 " after install, turn shell ~/.vim/bundle/vimproc, (n,g)make -f your_machines_makefile
 NeoBundle 'Shougo/vimshell'
+NeoBundle 'Shougo/vimfiler'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/neocomplcache'
 
-""
-"" neobundle.vim
-""
 " original repos on github
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'taq/vim-refact'
+NeoBundle 'Lokaltog/vim-easymotion'
 
 " color-scheme
 NeoBundle 'Lucius'
+"NeoBundle 'Zenburn'
+NeoBundle 'altercation/solarized'
+NeoBundle 'tomasr/molokai'
 
 " vim-scripts repos
 NeoBundle 'L9'
@@ -61,7 +67,6 @@ NeoBundle 'vim-scripts/taglist.vim'
 NeoBundle 'Gist.vim'
 
 " non git repos
-"NeoBundle 'http://svn.macports.org/repository/macports/contrib/mpvim/'
 
 filetype plugin indent on     " required!
 
@@ -70,11 +75,10 @@ filetype plugin indent on     " required!
 " :NeoBundleInstall(!)    - install(update) bundles
 " :NeoBundleClean(!)      - confirm(or auto-approve) removal of unused bundles
 
-"NeoBundle 'Zenburn'
 "NeoBundle 'blackdust.vim'
 "NeoBundle 'mrkn256.vim'
 "NeoBundle 'Wombat'
-"
+
 """ plugins
 "
 ""NeoBundle 'SQLUtilities'
@@ -82,20 +86,11 @@ filetype plugin indent on     " required!
 "NeoBundle 'kana/vim-textobj-line'
 "NeoBundle 'kana/vim-altr'
 "NeoBundle 'Shougo/git-vim'
-"NeoBundle 'Shougo/unite.vim'
-"NeoBundle 'Shougo/vimproc'  
 "NeoBundle 'sgur/unite-everything'
 "NeoBundle 'tryit.vim'
 "NeoBundle 'phrase.vim'
 "
 "NeoBundle 'utl.vim'
-"
-"" trinity
-"NeoBundle 'vim-scripts/trinity.vim'
-"NeoBundle 'taglist.vim'
-"NeoBundle 'Source-Explorer-srcexpl.vim'
-"NeoBundle 'The-NERD-tree'
-""NeoBundle 'trinity.vim'
 "
 ""NeoBundle 'calendar.vim'
 "
@@ -137,11 +132,139 @@ filetype plugin indent on     " required!
 "
 "" 変数の命名規則変更
 "NeoBundle 'tpope/vim-abolish'
+"============================================================
+"vimproc
+let g:vimproc_dll_path = $VIMRUNTIME . '/autoload/proc.so'
 
+"============================================================
+" unite.vim - ブックマーク、ファイル、履歴 等へのクイックアクセス
+"============================================================
+" 入力モードで開始する
+let g:unite_enable_start_insert=1
 
-""
-"" neocomplcache.vim
-""
+nnoremap  [unite] <Nop>
+nmap    , [unite]
+
+nnoremap <silent> [unite]f  :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+nnoremap <silent> [unite]c  :<C-u>UniteWithCurrentDir -buffer-name=files buffer file_mru bookmark file<CR>
+"nnoremap <silent> [unite]r  :<C-u>Unite -buffer-name=register register<CR>
+nnoremap <silent> [unite]r  :<C-u>Unite ref/refe<CR>
+nnoremap <silent> [unite]a  :<C-u>UniteWithBufferDir -buffer-name=files -prompt=%\  buffer file_mru bookmark file<CR>
+nnoremap <silent> [unite]m  :<C-u>Unite file_mru<CR>
+nnoremap <silent> [unite]b  :<C-u>Unite buffer<CR>
+nnoremap <silent> [unite]p  :<C-u>Unite phrase<CR>
+nnoremap <silent> [unite]o  :<C-u>Unite outline<CR>
+"nnoremap <silent> [unite]s  :<C-u>Unite source<CR>
+nnoremap <silent> [unite]s  :<C-u>Unite snippet<CR>
+nnoremap <silent> [unite]l  :<C-u>Unite line<CR>
+nnoremap <silent> [unite]g  :<C-u>Unite grep<CR>
+nnoremap <silent> [unite]e  :<C-u>NeoComplCacheEditSnippets<CR>
+"nnoremap <silent> [unite]e  :<C-u>Unite everything<CR>
+
+" todo: こんな感じでファイルタイプごとに、設定をまとめましょう"
+autocmd FileType unite call s:unite_my_settings()
+function! s:unite_my_settings()"{{{
+  " Overwrite settings.
+
+  " ウィンドウを分割して開く
+  nnoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
+  inoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
+  " ウィンドウを縦に分割して開く
+  nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
+  inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
+  " ESCキーを2回押すと終了する
+  nnoremap <silent> <buffer> <ESC><ESC> q
+  inoremap <silent> <buffer> <ESC><ESC> <ESC>q
+
+  "  nmap <buffer> <ESC>      <Plug>(unite_exit)
+  "  insertモード中、jjで、ノーマルモードに移行
+  imap <buffer> jj      <Plug>(unite_insert_leave)
+  "imap <buffer> <C-w>     <Plug>(unite_delete_backward_path)
+
+  " <C-l>: manual neocomplcache completion.
+  inoremap <buffer> <C-l>  <C-x><C-u><C-p><Down>
+
+  " Start insert.
+  let g:unite_enable_start_insert = 1
+endfunction"}}}
+
+let g:unite_source_file_mru_limit = 200
+let g:unite_cursor_line_highlight = 'TabLineSel'
+let g:unite_abbr_highlight = 'TabLine'
+
+"============================================================
+" autodate.vim - ファイルのタイムスタンプ記述を自動的に更新
+"============================================================
+let autodate_keyword_pre="Last Change: \*"
+let autodate_keyword_post="."
+let autodate_format="%Y/%m/%d %H:%M:%S"
+let autodate_lines=10
+
+"============================================================
+" monday.vim
+"============================================================
+"CTRL-A で8進数の計算をさせない
+set nrformats-=octal
+
+"============================================================
+" trinity.vim --- NERD_tree, taglist, srcexpl の統合
+"============================================================
+" Open and close the taglist.vim separately 
+nmap <F9>  :TrinityToggleTagList<CR> 
+" Open and close the NERD_tree.vim separately 
+nmap <F10>  :TrinityToggleNERDTree<CR>
+" Open and close the srcexpl.vim separately 
+nmap <F11>   :TrinityToggleSourceExplorer<CR> 
+" Open and close all the three plugins on the same time 
+nmap <F12>   :TrinityToggleAll<CR> 
+
+"============================================================
+" srcexpl.vim --- source explorer
+"============================================================
+" // The switch of the Source Explorer 
+"nmap <F8> :SrcExplToggle<CR> 
+
+" // Set the height of Source Explorer window 
+let g:SrcExpl_winHeight = 8 
+
+" // Set time for refreshing the Source Explorer 
+let g:SrcExpl_refreshTime = 1000 
+
+" // Set key to jump into the exact definition context 
+let g:SrcExpl_jumpKey = "<ENTER>" 
+
+" // Set key for back from the definition context 
+let g:SrcExpl_gobackKey = "<BS>" 
+
+" // In order to Avoid conflicts, the Source Explorer should know what plugins 
+" // are using buffers. And you need add their bufname into the list below 
+" // according to the command ":buffers!" 
+let g:SrcExpl_pluginList = [ 
+      \ "__Tag_List__", 
+      \ "_NERD_tree_", 
+      \ "Source_Explorer" 
+      \ ] 
+
+" // Enable/Disable the local definition searching, and note that this is not 
+" // guaranteed to work, the Source Explorer doesn't check the syntax for now. 
+" // It only searches for a match with the keyword according to command 'gd' 
+let g:SrcExpl_searchLocalDef = 1 
+
+" // Do not let the Source Explorer update the tags file when opening
+let g:SrcExpl_UpdateTags    = 1
+
+"let g:SrcExpl_RefreshMapKey = "<Space>"
+
+" // Use 'Exuberant Ctags' with '--sort=foldcase -R .' or '-L cscope.files' to 
+" //  create/update a tags file 
+let g:SrcExpl_updateTagsCmd = "ctags --sort=foldcase -R ." 
+
+" // key for updating the tags file artificially 
+let g:SrcExpl_updateTagsKey = "<S-F12>" 
+
+"============================================================
+" neocomplcache.vim
+"============================================================
 
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
@@ -155,7 +278,11 @@ let g:neocomplcache_enable_camel_case_completion = 1
 let g:neocomplcache_enable_underbar_completion = 1
 " Set minimum syntax keyword length.
 let g:neocomplcache_min_syntax_length = 3
+
 let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+
+"自動補完を行う入力数を設定。初期値は2
+let g:neocomplcache_auto_completion_start_length = 2
 
 " Define dictionary.
 let g:neocomplcache_dictionary_filetype_lists = {
@@ -217,68 +344,181 @@ let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
 let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 
+" Snippets
+let g:neocomplcache_snippets_dir = '~/.vim/snippets'
+
+" 補完候補の数
+let g:neocomplcache_max_list = 20
+
+" 1番目の候補を自動選択
+let g:neocomplcache_enable_auto_select = 1
+
+"遅延補完
+let g:NeoComplCache_EnableCursorHoldI = 1 
+
+"""" neocomplcache.vim
+
+"" Disable AutoComplPop.
+"let g:acp_enableAtStartup = 0
+"" Use neocomplcache.
+"let g:neocomplcache_enable_at_startup = 1
+"" Use smartcase.
+"let g:neocomplcache_enable_smart_case = 1
+"" Use camel case completion.
+"let g:neocomplcache_enable_camel_case_completion = 1
+"" Use underbar completion.
+"let g:neocomplcache_enable_underbar_completion = 1
+"" Set minimum syntax keyword length.
+"let g:neocomplcache_min_syntax_length = 3
+"let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+"
+"" Define dictionary.
+"let g:neocomplcache_dictionary_filetype_lists = {
+"      \ 'default' : '',
+"      \ 'autohotkey' : $HOME.'/.vim/dict/autohotkey.dic',
+"      \ 'vimshell' : $HOME.'/.vimshell_hist',
+"      \ 'scheme' : $HOME.'/.gosh_completions'
+"      \ }
+"
+"" Define keyword.
+"let g:neocomplcache_keyword_patterns = get(g:, 'neocomplecache_keyword_patterns', {})
+""if !exists('g:neocomplcache_keyword_patterns')
+""        let g:neocomplcache_keyword_patterns = {}
+""endif
+"let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+"
+"" Plugin key-mappings.
+"imap <C-k>     <Plug>(neocomplcache_snippets_expand)
+""imap <C-k>     <Plug>(neocomplcache_start_unite_complete)
+"smap <C-k>     <Plug>(neocomplcache_snippets_expand)
+"inoremap <expr><C-g>     neocomplcache#undo_completion()
+"inoremap <expr><C-l>     neocomplcache#complete_common_string()
+"
+"" SuperTab like snippets behavior.
+""imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+"
+"" Recommended key-mappings.
+"" <CR>: close popup and save indent.
+"inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
+"" <TAB>: completion.
+"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+"" <C-h>, <BS>: close popup and delete backword char.
+"inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+"inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+"inoremap <expr><C-y>  neocomplcache#close_popup()
+"inoremap <expr><C-e>  neocomplcache#cancel_popup()
+"
+"" AutoComplPop like behavior.
+"let g:neocomplcache_enable_auto_select = 1
+"
+"" Shell like behavior(not recommended).
+""set completeopt+=longest
+"set completeopt+=menu,preview
+"
+"" Enable omni completion.
+"autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+"autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+"autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+"autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+"autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+"autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+"
+"" Enable heavy omni completion.
+"let g:neocomplcache_omni_patterns = get(g:, 'neocomplcache_omni_patterns', {})
+""if !exists('g:neocomplcache_omni_patterns')
+""        let g:neocomplcache_omni_patterns = {}
+""endif
+"
+"let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
+"let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+"let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
+"let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+"
+"" Snippets
+"let g:neocomplcache_snippets_dir = '~/.vim/snippets'
+"
+"" 補完候補の数
+"let g:neocomplcache_max_list = 20
+"
+"" 1番目の候補を自動選択
+"let g:neocomplcache_enable_auto_select = 1
+"
+""遅延補完
+"let g:NeoComplCache_EnableCursorHoldI = 1 
+"
 "-----------------------------------------------------------------------------
 "
-""Escの1回押しでハイライト消去
-""nmap <ESC><ESC> ;nohlsearch<CR><ESC>
-"
-"" ディレクトリ自動移動 (開いたファイルのディレクトリがカレントディレクトリに)
-"" 全ファイルを対象にすると Gist.vim がおかしげになるので、html,shtml,css,js,php,pl,tpl を対象に
-"au BufEnter *.rb,*.ahk,*.txt,*.htm,*.html,*.shtml,*.css,*.js,*.php,*.pl,*.tpl execute ":lcd " . expand("%:p:h")
-"
-"" 入力モード時、ステータスラインのカラーを変更
-"augroup InsertHook
-"  autocmd!
-"  autocmd InsertEnter * highlight StatusLine guifg=#ccdc90 guibg=#2E4340
-"  autocmd InsertLeave * highlight StatusLine guifg=#2E4340 guibg=#ccdc90
-"augroup END
-"
-""カーソル行下線（「set cursorline」がある場合に有効）
-"set cursorline
-"
+"Escの1回押しでハイライト消去
+nmap <ESC><ESC> ;nohlsearch<CR><ESC>
+
+" Ctrl-iでヘルプ
+nnoremap <C-i>  :<C-u>help<Space>
+" カーソル下のキーワードをヘルプでひく
+nnoremap <C-i><C-i> :<C-u>help<Space><C-r><C-w><Enter>
+
+" ディレクトリ自動移動 (開いたファイルのディレクトリがカレントディレクトリに)
+" 全ファイルを対象にすると Gist.vim がおかしげになるので、html,shtml,css,js,php,pl,tpl を対象に
+au BufEnter *.rb,*.cs,*.ahk,*.txt,*.htm,*.html,*.shtml,*.css,*.js,*.php,*.pl,*.tpl execute ":lcd " . expand("%:p:h")
+
+" ;でコマンド入力( ;と:を入れ替)
+noremap ; :
+noremap : ;
+
+" C-; で、ノーマルモードに戻る todo: うまくいってない
+imap <C-j> <ESC>
+cmap <C-j> <ESC>
+
+" 入力モード時、ステータスラインのカラーを変更
+augroup InsertHook
+  autocmd!
+  "autocmd InsertEnter * highlight StatusLine guifg=#ccdc90 guibg=#2E4340
+  autocmd InsertEnter * highlight StatusLine guifg=#000000 guibg=#ff0000
+  autocmd InsertLeave * highlight StatusLine guifg=#2E4340 guibg=#ccdc90
+augroup END
+
 "" タブ文字、行末など不可視文字を表示する
 "" タブ文字を CTRL-I で表示し、行末に $ で表示する。（有効:list/無効:nolist）
 ""set list
-"
-"" 横分割時は下へ､ 縦分割時は右へ新しいウィンドウが開くようにする
-"set splitbelow
-"set splitright
-"
-"
-""スペースを含むファイル名の場合にも、正確なファイル名を取得できるように
-"set isfname+=32
-"
+
+" 横分割時は下へ､ 縦分割時は右へ新しいウィンドウが開くようにする
+set splitbelow
+set splitright
+
+
+"スペースを含むファイル名の場合にも、正確なファイル名を取得できるように
+set isfname+=32
+
 ""矩形選択で行末以降も選択できるようにする
 ""set virtualedit+=block
 "
-"" ビジュアルベル
-"set visualbell
-"
+" ビジュアルベル
+set visualbell
+
 "" タブの入力を空白文字に置き換える
 "set expandtab
 "
 "" タブページのラインを表示:2つ以上タブページがある場合に表示
 "set showtabline=2
-"
-"" スペースやTabなどの見えない文字を表示させる
-""set list
-""set listchars=tab:≫-,trail:-,eol:?,extends:≫,precedes:≪,nbsp:%
-"
 
-"" バックスペースでインデントや改行を削除できるようにする
-"set backspace=indent,eol,start
-"
+" スペースやTabなどの見えない文字を表示させる
+"set list
+"set listchars=tab:≫-,trail:-,eol:?,extends:≫,precedes:≪,nbsp:%
+
+
+" バックスペースでインデントや改行を削除できるようにする
+set backspace=indent,eol,start
+
 "set history=50		" keep 50 lines of command line history
 "set ruler		" show the cursor position all the time
 "set showcmd		" display incomplete commands
 "
-"" 検索文字を打ち込むと即検索
-"set incsearch		" do incremental searching
-""
-""括弧の入力時にカーソルを対応する括弧の上に一定時間表示させる 
-"set showmatch
-"set matchtime=3
-"
+" 検索文字を打ち込むと即検索
+set incsearch		" do incremental searching
+
+"括弧の入力時にカーソルを対応する括弧の上に一定時間表示させる 
+set showmatch
+set matchtime=3
+
 "" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
 "" let &guioptions = substitute(&guioptions, "t", "", "g")
 "
@@ -399,22 +639,22 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 ""  set ambiwidth=double
 ""endif
 "
-""Ctrl + t"の代わりに、"Ctrl + ["でタグジャンプから戻れるようになります。"Ctrl + ]"でタグジャンプするので、その逆の操作は"Ctrl + ["でできれば直感的
-"nmap <c-[>  :pop<CR>
-"
-""C-vの矩形選択で行末より後ろもカーソルを置ける
-"set virtualedit=block
-"
+"Ctrl + t"の代わりに、"Ctrl + ["でタグジャンプから戻れるようになります。"Ctrl + ]"でタグジャンプするので、その逆の操作は"Ctrl + ["でできれば直感的
+nmap <c-[>  :pop<CR>
+
+"C-vの矩形選択で行末より後ろもカーソルを置ける
+set virtualedit=block
+
 ""辞書ファイルを使用する設定に変更
 "set complete+=k
 "
-""クリップボードをWindowsと連携
-""set clipboard=unnamed
-""ビジュアル行で選択下だけで、自動的に*レジスタにコピーする
-""set clipboard=autoselect,unnamed
-""↓
-"set clipboard=unnamedplus,unnamed
-"
+"クリップボードをWindowsと連携
+"set clipboard=unnamed
+"ビジュアル行で選択下だけで、自動的に*レジスタにコピーする
+"set clipboard=autoselect,unnamed
+"↓
+set clipboard=unnamedplus,unnamed
+
 "" 折り返ししない
 "set nowrap
 "
@@ -423,20 +663,20 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 ""highlight WhitespaceEOL ctermbg=red guibg=red
 ""match WhitespaceEOL /\s\+$/
 ""autocmd WinEnter * match WhitespaceEOL /\s\+$/
-"
-"" -------------------
-"" http://nanabit.net/blog/2007/11/03/vim-cursorline/
-"" カレントウィンドウにのみ罫線を引く
-"" -------------------
-""augroup cch
-""  autocmd! cch
-""  autocmd WinLeave * set nocursorcolumn nocursorline
-""  autocmd WinEnter,BufRead * set cursorcolumn cursorline
-""augroup END
-"
-""highlight CursorLine ctermbg=black guibg=black
-""highlight CursorColumn ctermbg=black guibg=black
-"
+
+" -------------------
+" http://nanabit.net/blog/2007/11/03/vim-cursorline/
+" カレントウィンドウにのみ罫線を引く
+" -------------------
+augroup cch
+  autocmd! cch
+  autocmd WinLeave * set nocursorcolumn nocursorline
+  autocmd WinEnter,BufRead * set cursorcolumn cursorline
+augroup END
+
+highlight CursorLine ctermbg=black guibg=black
+highlight CursorColumn ctermbg=black guibg=black
+
 "" -------------------
 "" migemo(g/)
 "" -------------------
@@ -475,68 +715,64 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "" タブページのラベルを常に表示する(2つ以上タブページがある場合に表示)
 "set showtabline=1
 "
-"" -------------------
-"" 検索
-"" -------------------
-"" 検索時に最後まで行ったら最初に戻る
-"set wrapscan
-"
-""インデントはスマートインデント
-"set smartindent
-"
-"" 検索時に大文字小文字を無視
-"set ignorecase
-"
-"" 検索文字列に大文字が含まれている場合は区別して検索する(nosmartcase)
-""set smartcase
-"set nosmartcase
-"
+"============================================================
+" 検索
+"============================================================
+" 検索時に最後まで行ったら最初に戻る
+set wrapscan
+
+"インデントはスマートインデント
+set smartindent
+
+" 検索時に大文字小文字を無視
+set ignorecase
+
+" 検索文字列に大文字が含まれている場合は区別して検索する(nosmartcase)
+"set smartcase
+set nosmartcase
+
 "" 全角スペースを視覚化
 "highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=#666666
 "au BufNewFile,BufRead * match ZenkakuSpace /　/
-"
-"" 行番号表示
-"set number
-"
+
+" 行番号表示
+set number
+
 "" 日付の入力補完
 "inoremap <expr> ,df strftime('%Y-%m-%dT%H:%M:%S')
 "inoremap <expr> ,dd strftime('%Y-%m-%d')
 "inoremap <expr> ,dt strftime('%H:%M:%S')
-"
-"" 貼り付け
-""nnoremap <C-S-v> "+p
-"
-"" バックアップファイルを作るディレクトリを設定
+
+" 貼り付け
+"nnoremap <C-S-v> "+p
+
+" バックアップファイルを作るディレクトリを設定
 "set backup
 "set backupdir=~/backup
-""set nobackup
-"
-""ビジュアルモード時vで行末まで選択
-"vnoremap v $h
-"
-"" スワップファイル
-""set swapfile
-"set noswapfile
-"
+set nobackup
+
+"ビジュアルモード時 v で行末まで選択
+vnoremap v $h
+
+" スワップファイル
+"set swapfile
+set noswapfile
+
 "" スワップファイル用のディレクトリ
 "set directory=~/swap
-""
-""タグファイル
-"" ; を付けると、上の各階層も辿る
-"set tags=./tags;
-"
-"" コマンドライン補完するときに強化されたものを使う(参照 :help wildmenu)
-"" set wildmenu
-"" コマンドライン補間をシェルっぽく
-""set wildmode=list:longest
-"set wildmode=longest:full,full
-"
-"" バッファが編集中でもその他のファイルを開けるように
-"set hidden
-"
-"" 外部のエディタで編集中のファイルが変更されたら自動で読み直す
-"set autoread
-"
+
+" コマンドライン補完するときに強化されたものを使う(参照 :help wildmenu)
+" set wildmenu
+" コマンドライン補間をシェルっぽく
+"set wildmode=list:longest
+set wildmode=longest:full,full
+
+" バッファが編集中でもその他のファイルを開けるように
+set hidden
+
+" 外部のエディタで編集中のファイルが変更されたら自動で読み直す
+set autoread
+
 ""format.vimを使うための設定
 "let format_join_spaces = 2
 "let format_allow_over_tw = 0 
@@ -544,49 +780,52 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 ""対応するカッコの強調表示をやめる
 "let loaded_matchparen = 1
 "
-""----------------------------------------------------------------------
+"============================================================
 ""ステータスラインに文字コードと改行文字を表示する
-"function! GetB()
-"  let c = matchstr(getline('.'), '.', col('.') - 1)
-"  let c = iconv(c, &enc, &fenc)
-"  return String2Hex(c)
-"endfunction
+"============================================================
+function! GetB()
+  let c = matchstr(getline('.'), '.', col('.') - 1)
+  let c = iconv(c, &enc, &fenc)
+  return String2Hex(c)
+endfunction
+
+" :help eval-examples
+" The function Nr2Hex() returns the Hex string of a number.
+func! Nr2Hex(nr)
+  let n = a:nr
+  let r = ""
+  while n
+    let r = '0123456789ABCDEF'[n % 16] . r
+    let n = n / 16
+  endwhile
+  return r
+endfunc
 "
-"" :help eval-examples
-"" The function Nr2Hex() returns the Hex string of a number.
-"func! Nr2Hex(nr)
-"  let n = a:nr
-"  let r = ""
-"  while n
-"    let r = '0123456789ABCDEF'[n % 16] . r
-"    let n = n / 16
-"  endwhile
-"  return r
-"endfunc
-""
-"" The function String2Hex() converts each character in a string to a two
-"" character Hex string.
-"func! String2Hex(str)
-"  let out = ''
-"  let ix = 0
-"  while ix < strlen(a:str)
-"    let out = out . Nr2Hex(char2nr(a:str[ix]))
-"    let ix = ix + 1
-"  endwhile
-"  return out
-"endfunc
-"
-""ステータスラインに文字コードと改行文字を表示する
-"" set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']['.&ft.']'}\ %F%=%l,%c%V%8P
-"if winwidth(0) >= 120
-"  set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %F%=[%{GetB()}]\ %l,%c%V%8P
-"else
-"  set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %f%=[%{GetB()}]\ %l,%c%V%8P
-"endif
-"
-""set statusline=%{GetB()}
-"
-""Vim付属のエクスプローラ(:explore)で簡単にファイルを開くディレクトリを指定
+" The function String2Hex() converts each character in a string to a two
+" character Hex string.
+func! String2Hex(str)
+  let out = ''
+  let ix = 0
+  while ix < strlen(a:str)
+    let out = out . Nr2Hex(char2nr(a:str[ix]))
+    let ix = ix + 1
+  endwhile
+  return out
+endfunc
+
+"ステータスラインに文字コードと改行文字を表示する
+" set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']['.&ft.']'}\ %F%=%l,%c%V%8P
+if winwidth(0) >= 120
+  set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %F%=[%{GetB()}]\ %l,%c%V%8P
+else
+  set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %f%=[%{GetB()}]\ %l,%c%V%8P
+endif
+
+"set statusline=%{GetB()}
+
+"============================================================
+"Vim付属のエクスプローラ(:explore)で簡単にファイルを開くディレクトリを指定
+"============================================================
 ""set browsedir=last	" 前回にファイルブラウザを使ったディレクト
 "set browsedir=buffer	" バッファで開いているファイルのディレクトリ
 ""set browsedir=current	" カレントディレクトリ
@@ -594,26 +833,31 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 ""set browsedir=d:/dropbox/scripts
 ""----------------------------------------------------------------------
 "
-"" フルパスを指定せずに、ファイル名だけでファイルを開けるようにする
+"============================================================
+" フルパスを指定せずに、ファイル名だけでファイルを開けるようにする
+"============================================================
 "let path+="~,d:/dropbox/scripts"
 ""let path += "~,d:/dropbox/scripts"
-"
+
 "" encoding
 "nmap ,U :set encoding=utf-8<CR>
 "nmap ,E :set encoding=euc-jp<CR>
 "nmap ,S :set encoding=cp932<CR>
-"
-"" 端末の文字コード
-"set encoding=cp932
-""set encoding=utf-8
-"
-""  ファイルの文字コード
-""set fileencoding=cp932
-"set fileencoding=utf-8
-"
-"" 自動認識する文字コード.
-"set fileencodings=utf-8,cp932,euc-jp,iso-2022-jp
-"
+
+"============================================================
+" 文字コード
+"============================================================
+" 端末の文字コード
+set encoding=cp932
+"set encoding=utf-8
+
+"  ファイルの文字コード
+"set fileencoding=cp932
+set fileencoding=utf-8
+
+" 自動認識する文字コード.
+set fileencodings=utf-8,cp932,euc-jp,iso-2022-jp
+
 "" タブ文字を強調.
 ""highlight tabs ctermbg=green guibg=green
 ""match tabs /\t/
@@ -623,31 +867,34 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "
 ""勝手にカレントディレクトリを移動しちゃうぜ！
 "au BufEnter Makefile,*.bat,*.c,*.h,*.pl,*.php,*.js,*.css,*.html,*.xml,*.xsl,*.sql,*.vim,*.rb,*.ahk,autohotkey.ini,*.ini execute ":lcd " . expand("%:p:h")
-"
-"" 前回終了したカーソル行に移動
-"autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
-"
-"" 改行コードの自動認識
-"set fileformats=dos,unix,mac
-"
-""必要なタグファイルを指定すんだよ！
-"" set tags
-"" from id:secondlife
+
+" 前回終了したカーソル行に移動
+autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
+
+" 改行コードの自動認識
+set fileformats=dos,unix,mac
+
+"必要なタグファイルを指定すんだよ！
+"タグファイル
+" from id:secondlife
 "if has("autochdir")
-"  set autochdir
 "  set tags=tags;
 "else
+set autochdir
+" ; を付けると、上の各階層も辿る
+"  set tags=./tags;
+set tags=tags;/
 "  set tags=./tags,./../tags,./*/tags,./../../tags,./../../../tags,./../../../../tags,./../../../../../tags
 "endif
-"
-"" -------------------
-"" コマンドモードで、C-xとc-zで、編集中ファイルのパスを補完
-"" -------------------
-"" expand path
-"cmap <c-x> <c-r>=expand('%:p:h')<cr>/
-"" expand file (not ext)
-"cmap <c-z> <c-r>=expand('%:p:r')<cr>
-"
+
+"============================================================
+" コマンドモードで、C-xとc-zで、編集中ファイルのパスを補完
+"============================================================
+" expand path
+cmap <c-x> <c-r>=expand('%:p:h')<cr>/
+" expand file (not ext)
+cmap <c-z> <c-r>=expand('%:p:r')<cr>
+
 "" -------------------
 "" キーバインド
 "" -------------------
@@ -666,63 +913,38 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 ""map <F4> <ESC>:bw<CR>
 "
 "" 挿入モードからESCで抜けたときに :w する
-"imap <ESC> <ESC>:w<CR>
-"
+imap <ESC> <ESC>:w<CR>
+
 ""挿入モードで移動
 "inoremap <C-a> <Home>
 "inoremap <C-e> <End>
 "inoremap <C-f> <Right>
 "inoremap <C-b> <Left>
 "
-"" 括弧を入力したら自動的に閉じ括弧を入力
-"inoremap { {}<LEFT>
-"inoremap [ []<LEFT>
-"inoremap ( ()<LEFT>
-"inoremap " ""<LEFT>
-"inoremap ' ''<LEFT>
-"vnoremap { "zdi^V{<C-R>z}<ESC>
-"vnoremap [ "zdi^V[<C-R>z]<ESC>
-"vnoremap ( "zdi^V(<C-R>z)<ESC>
-"vnoremap " "zdi^V"<C-R>z^V"<ESC>
-"vnoremap ' "zdi'<C-R>z'<ESC>
-"
-"" 閉じ括弧を自動補完
-""inoremap ( ()i
-""inoremap ) ClosePair(')')
-""inoremap { {}i
-""inoremap } ClosePair('}')
-""inoremap [ []i
-""inoremap ] ClosePair(']')
-"
-"" pair close checker.
-"" from othree vimrc ( http://github.com/othree/rc/blob/master/osx/.vimrc )
-""inoremap { {}<LEFT>
-""inoremap [ []<LEFT>
-""inoremap ( ()<LEFT>
-""inoremap " ""<LEFT>
-""inoremap ' ''<LEFT>
-""vnoremap { "zdi^V{<C-R>z}<ESC>
-""vnoremap [ "zdi^V[<C-R>z]<ESC>
-""vnoremap ( "zdi^V(<C-R>z)<ESC>
-""vnoremap " "zdi^V"<C-R>z^V"<ESC>
-""vnoremap ' "zdi'<C-R>z'<ESC>
-""function ClosePair(char)
-""    if getline('.')[col('.') - 1] == a:char
-""        return "\"
-""    else
-""        return a:char
-""    endif
-""endf
-"
-"" 特定のファイル保存前に、行末の空白を除去する
-"function! RTrim()
-"  let s:cursor = getpos(".")
-"  %s/\s\+$//e
-"  call setpos(".", s:cursor)
-"endfunction
-"
-"autocmd BufWritePre *.php,*.rb,*.js,*.bat,*.py,.autotest,*.watchr,*.ahk call RTrim()
-"
+" 括弧を入力したら自動的に閉じ括弧を入力
+inoremap { {}<LEFT>
+inoremap [ []<LEFT>
+inoremap ( ()<LEFT>
+inoremap " ""<LEFT>
+inoremap ' ''<LEFT>
+vnoremap { "zdi^V{<C-R>z}<ESC>
+vnoremap [ "zdi^V[<C-R>z]<ESC>
+vnoremap ( "zdi^V(<C-R>z)<ESC>
+vnoremap " "zdi^V"<C-R>z^V"<ESC>
+vnoremap ' "zdi'<C-R>z'<ESC>
+"todo:VIMScriptモードの時は、"を補完しないようにしたい
+
+"====================================================================== 
+" 特定のファイル保存前に、行末の空白を除去する
+"====================================================================== 
+function! RTrim()
+  let s:cursor = getpos(".")
+  %s/\s\+$//e
+  call setpos(".", s:cursor)
+endfunction
+
+autocmd BufWritePre *.cs,*.php,*.rb,*.js,*.bat,*.py,.autotest,*.watchr,*.ahk call RTrim()
+
 "" ====================================================================== 
 "" Key map
 "" ====================================================================== 
@@ -749,7 +971,6 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "  endif 
 "endfunction 
 "
-"autocmd FileType vim set expandtab autoindent softtabstop=2 tabstop=2 shiftwidth=2
 "
 """ FileType:autohotkey
 "
@@ -765,7 +986,21 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 ""autocmd FileType autohotkey nmap <S-F1> :call Win32Help('D:\Dropbox\bin\AutoHotkeyJP.chm',expand('<cword>'))<CR>
 "autocmd FileType autohotkey nmap <F1> :call Win32Help('D:\Dropbox\bin\AutoHotkeyJP.chm',expand('<cword>'))<CR>
 "
-""" FileType:Ruby
+"============================================================
+" FileType:cs
+"============================================================
+
+autocmd FileType cs set expandtab autoindent softtabstop=4 tabstop=4 shiftwidth=4
+"autocmd BufNewFile *.rb	0r ~/.vim/templates/template.rb
+
+"============================================================
+" FileType:vim
+"============================================================
+autocmd FileType vim set expandtab autoindent softtabstop=2 tabstop=2 shiftwidth=2
+
+"============================================================
+" FileType:Ruby
+"============================================================
 "
 "autocmd BufWinEnter,BufNewFile *.watchr,.autotest set filetype=ruby
 "
@@ -781,175 +1016,11 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 ""autocmd FileType ruby nmap <S-F1> :call Win32Help('D:\Dropbox\bin\rubymanjp.chm',expand('<cword>'))<CR>
 "autocmd FileType ruby nmap <F1> :call Win32Help('D:\Dropbox\bin\rubymanjp.chm',expand('<cword>'))<CR>
 ""nmap <S-F1> :call Win32Help(expand('<cword>'))<CR>
-"
-"" ---------------------------------------- 
-"""" plugins
-"
-"" ---------------------------------------- 
-"""" neocomplcache.vim
-"
-"" Disable AutoComplPop.
-"let g:acp_enableAtStartup = 0
-"" Use neocomplcache.
-"let g:neocomplcache_enable_at_startup = 1
-"" Use smartcase.
-"let g:neocomplcache_enable_smart_case = 1
-"" Use camel case completion.
-"let g:neocomplcache_enable_camel_case_completion = 1
-"" Use underbar completion.
-"let g:neocomplcache_enable_underbar_completion = 1
-"" Set minimum syntax keyword length.
-"let g:neocomplcache_min_syntax_length = 3
-"let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-"
-"" Define dictionary.
-"let g:neocomplcache_dictionary_filetype_lists = {
-"      \ 'default' : '',
-"      \ 'autohotkey' : $HOME.'/.vim/dict/autohotkey.dic',
-"      \ 'vimshell' : $HOME.'/.vimshell_hist',
-"      \ 'scheme' : $HOME.'/.gosh_completions'
-"      \ }
-"
-"" Define keyword.
-"let g:neocomplcache_keyword_patterns = get(g:, 'neocomplecache_keyword_patterns', {})
-""if !exists('g:neocomplcache_keyword_patterns')
-""        let g:neocomplcache_keyword_patterns = {}
-""endif
-"let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-"
-"" Plugin key-mappings.
-"imap <C-k>     <Plug>(neocomplcache_snippets_expand)
-""imap <C-k>     <Plug>(neocomplcache_start_unite_complete)
-"smap <C-k>     <Plug>(neocomplcache_snippets_expand)
-"inoremap <expr><C-g>     neocomplcache#undo_completion()
-"inoremap <expr><C-l>     neocomplcache#complete_common_string()
-"
-"" SuperTab like snippets behavior.
-""imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
-"
-"" Recommended key-mappings.
-"" <CR>: close popup and save indent.
-"inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-"" <TAB>: completion.
-"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-"" <C-h>, <BS>: close popup and delete backword char.
-"inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-"inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-"inoremap <expr><C-y>  neocomplcache#close_popup()
-"inoremap <expr><C-e>  neocomplcache#cancel_popup()
-"
-"" AutoComplPop like behavior.
-"let g:neocomplcache_enable_auto_select = 1
-"
-"" Shell like behavior(not recommended).
-""set completeopt+=longest
-"set completeopt+=menu,preview
-"
-"" Enable omni completion.
-"autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-"autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-"autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-"autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-"autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-"autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-"
-"" Enable heavy omni completion.
-"let g:neocomplcache_omni_patterns = get(g:, 'neocomplcache_omni_patterns', {})
-""if !exists('g:neocomplcache_omni_patterns')
-""        let g:neocomplcache_omni_patterns = {}
-""endif
-"
-"let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
-"let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-"let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-"let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
-"
-"" Snippets
-"let g:neocomplcache_snippets_dir = '~/.vim/snippets'
-"
-"" 補完候補の数
-"let g:neocomplcache_max_list = 20
-"
-"" 1番目の候補を自動選択
-"let g:neocomplcache_enable_auto_select = 1
-"
-""遅延補完
-"let g:NeoComplCache_EnableCursorHoldI = 1 
-"
-""""
-"""" unite.vim - ブックマーク、ファイル、履歴 等へのクイックアクセス
-""""
-"
-"" 入力モードで開始する
-""let g:unite_enable_start_insert=1
-"
-"nnoremap   [unite]   <Nop>
-"nmap    ,u [unite]
-"
-"nnoremap <silent> [unite]f  :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-""nnoremap <silent> [unite]c  :<C-u>UniteWithCurrentDir -buffer-name=files buffer file_mru bookmark file<CR>
-""nnoremap <silent> [unite]r  :<C-u>Unite -buffer-name=register register<CR>
-"nnoremap <silent> [unite]r  :<C-u>Unite ref/refe<CR>
-"nnoremap <silent> [unite]a  :<C-u>UniteWithBufferDir -buffer-name=files -prompt=%\  buffer file_mru bookmark file<CR>
-""nnoremap <silent> [unite]u  :<C-u>UniteWithBufferDir -buffer-name=files -prompt=%\  buffer file_mru bookmark file<CR>
-"nnoremap <silent> [unite]m  :<C-u>Unite file_mru<CR>
-"nnoremap <silent> [unite]b  :<C-u>Unite buffer<CR>
-"nnoremap <silent> [unite]p  :<C-u>Unite phrase<CR>
-"nnoremap <silent> [unite]o  :<C-u>Unite outline<CR>
-"nnoremap <silent> [unite]s  :<C-u>Unite source<CR>
-"nnoremap <silent> [unite]l  :<C-u>Unite line<CR>
-"nnoremap <silent> [unite]g  :<C-u>Unite grep<CR>
-"nnoremap <silent> [unite]e  :<C-u>Unite everything<CR>
-"
-"" todo: こんな感じでファイルタイプごとに、設定をまとめましょう"
-"autocmd FileType unite call s:unite_my_settings()
-"function! s:unite_my_settings()"{{{
-"  " Overwrite settings.
-"
-"  " ウィンドウを分割して開く
-"  nnoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
-"  inoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
-"  " ウィンドウを縦に分割して開く
-"  nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
-"  inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
-"  " ESCキーを2回押すと終了する
-"  nnoremap <silent> <buffer> <ESC><ESC> q
-"  inoremap <silent> <buffer> <ESC><ESC> <ESC>q
-"
-"  "  nmap <buffer> <ESC>      <Plug>(unite_exit)
-"  imap <buffer> jj      <Plug>(unite_insert_leave)
-"  "imap <buffer> <C-w>     <Plug>(unite_delete_backward_path)
-"
-"  " <C-l>: manual neocomplcache completion.
-"  inoremap <buffer> <C-l>  <C-x><C-u><C-p><Down>
-"
-"  " Start insert.
-"  let g:unite_enable_start_insert = 1
-"endfunction"}}}
-"
-"let g:unite_source_file_mru_limit = 200
-"let g:unite_cursor_line_highlight = 'TabLineSel'
-"let g:unite_abbr_highlight = 'TabLine'
-"
-"" For optimize.
-"let g:unite_source_file_mru_filename_format = ''
-"
-""""
-"""" autodate.vim - ファイルのタイムスタンプ記述を自動的に更新
-""""
-"let autodate_keyword_pre="Last Change: \*"
-"let autodate_keyword_post="."
-"let autodate_format="%Y/%m/%d %H:%M:%S"
-"let autodate_lines=10
-"
-""""
-"""" monday.vim
-""""
-""CTRL-A で8進数の計算をさせない
-"set nrformats-=octal
-"
-"""" quickrun.vim
-"
+
+
+"============================================================
+" quickrun.vim
+"============================================================
 "" コンフィグを全クリア
 "let g:quickrun_config = {}
 "
@@ -1022,75 +1093,25 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "nmap <silent> <S-F7> :VersDiff -c<CR>
 "nmap <silent> <S-F8> :VersDiff -c<CR>
 "
-"" ---------------------------------------- 
-"""" trinity.vim --- NERD_tree, taglist, srcexpl の統合
-"
-"" Open and close the taglist.vim separately 
-"nmap <F9>  :TrinityToggleTagList<CR> 
-"" Open and close the NERD_tree.vim separately 
-"nmap <F10>  :TrinityToggleNERDTree<CR>
-"" Open and close the srcexpl.vim separately 
-"nmap <F11>   :TrinityToggleSourceExplorer<CR> 
-"" Open and close all the three plugins on the same time 
-"nmap <F12>   :TrinityToggleAll<CR> 
-"
-"" ---------------------------------------- 
-"""" srcexpl --- source explorer
-"
-"" // The switch of the Source Explorer 
-""nmap <F8> :SrcExplToggle<CR> 
-"
-"" // Set the height of Source Explorer window 
-"let g:SrcExpl_winHeight = 8 
-"
-"" // Set time for refreshing the Source Explorer 
-"let g:SrcExpl_refreshTime = 1000 
-"
-"" // Set key to jump into the exact definition context 
-"let g:SrcExpl_jumpKey = "<ENTER>" 
-"
-"" // Set key for back from the definition context 
-"let g:SrcExpl_gobackKey = "<BS>" 
-"
-"" // In order to Avoid conflicts, the Source Explorer should know what plugins 
-"" // are using buffers. And you need add their bufname into the list below 
-"" // according to the command ":buffers!" 
-"let g:SrcExpl_pluginList = [ 
-"      \ "__Tag_List__", 
-"      \ "_NERD_tree_", 
-"      \ "Source_Explorer" 
-"      \ ] 
-"
-"" // Enable/Disable the local definition searching, and note that this is not 
-"" // guaranteed to work, the Source Explorer doesn't check the syntax for now. 
-"" // It only searches for a match with the keyword according to command 'gd' 
-"let g:SrcExpl_searchLocalDef = 1 
-"
-"" // Do not let the Source Explorer update the tags file when opening 
-""let g:SrcExpl_isUpdateTags = 0 
-"
-"" // Use 'Exuberant Ctags' with '--sort=foldcase -R .' or '-L cscope.files' to 
-"" //  create/update a tags file 
-"let g:SrcExpl_updateTagsCmd = "ctags --sort=foldcase -R ." 
-"
-"" // key for updating the tags file artificially 
-"let g:SrcExpl_updateTagsKey = "<S-F12>" 
-"
-""""  Utl.vim
+"============================================================
+"  Utl.vim
+"============================================================
 "nnoremap <silent> gx :silent exe 'Utl'<cr><cr>
-"
-"" ---------------------------------------- 
-"""" gist.vim
-""nnoremap <silent> ,gn :Gist<cr>
-""nnoremap <silent> ,gl :Gist -l<cr>
-""nnoremap <silent> ,ga :Gist -a<cr>
-""nnoremap <silent> ,ge :Gist -e<cr>
-""nnoremap <silent> ,gp :Gist -p<cr>
-""nnoremap <silent> ,gr :Gist
-""nnoremap <silent> ,gu :Gist -l
-"
-"" ---------------------------------------- 
-"""" smartchr.vim --- キーを押す回数で挿入文字が変わる
+
+"============================================================
+" gist.vim
+"============================================================
+"nnoremap <silent> ,gn :Gist<cr>
+"nnoremap <silent> ,gl :Gist -l<cr>
+"nnoremap <silent> ,ga :Gist -a<cr>
+"nnoremap <silent> ,ge :Gist -e<cr>
+"nnoremap <silent> ,gp :Gist -p<cr>
+"nnoremap <silent> ,gr :Gist
+"nnoremap <silent> ,gu :Gist -l
+
+"============================================================
+" smartchr.vim --- キーを押す回数で挿入文字が変わる
+"============================================================
 "" todo: 言語によって、文字パターンが変わるようにして
 ""inoremap <expr> = smartchr#loop(' = ', ' == ', ' =~ ', ' => ', '=')
 ""inoremap <expr> - smartchr#loop(' -', ' - ', ' -= ', '-')
@@ -1122,9 +1143,10 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "inoremap <expr> = search('\(&\<Bar><Bar>\<Bar>+\<Bar>-\<Bar>/\<Bar>>\<Bar><\) \%#', 'bcn')? '<bs>= '
 "    \ : search('\(*\<Bar>!\)\%#', 'bcn') ? '= '
 "    \ : smartchr#one_of(' = ', ' == ', '=')
-"
-"" ---------------------------------------- 
-"""" vim-ref.vim
+
+"============================================================
+" vim-ref.vim
+"============================================================
 "" HTMLのテキストへのコンバートに、lynx を使う
 "let g:ref_alc_cmd='lynx -dump -nonumbers %s'
 "let g:ref_alc_use_cache = 1
@@ -1159,9 +1181,10 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "
 "" KeyMap
 ""map <C-T> :call QuickChange()<CR>
-"
-"" ---------------------------------------- 
-"""" vim-altr - ワンタッチで、関連ファイルを順番に切り替え
+
+"============================================================
+" vim-altr - ワンタッチで、関連ファイルを順番に切り替え
+"============================================================
 "nmap <F3> <Plug>(altr-forward)
 "nmap <F2> <Plug>(altr-back)
 "
@@ -1171,5 +1194,13 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "call altr#define('app/models/%.rb', 'spec/models/%_spec.rb', 'spec/factories/%s.rb')
 "call altr#define('app/controllers/%.rb', 'spec/controllers/%_spec.rb')
 "call altr#define('app/helpers/%.rb', 'spec/helpers/%_spec.rb')
-"
-"
+
+
+"============================================================
+" カーソル移動風に、カレントバッファを移動する
+"============================================================
+nmap <C-H> <C-W>h 
+nmap <C-J> <C-W>j 
+nmap <C-K> <C-W>k 
+nmap <C-L> <C-W>l 
+

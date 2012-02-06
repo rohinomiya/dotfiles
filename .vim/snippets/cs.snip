@@ -1,0 +1,325 @@
+snippet     class
+abbr        class{ }
+prev_word   '^'
+    class ${1:classname} {
+        ${2}
+    }
+
+snippet     log4netprop
+abbr        property logger(log4net)
+prev_word   '^'
+    // ロガー
+    private log4net.ILog _logger;
+    public log4net.ILog logger {
+        get {
+            return _logger;
+        }
+        set {
+            _logger = value;
+        }
+    }
+
+    ${1}
+
+snippet     log4net
+abbr        log4net logger の生成
+prev_word   '^'
+    //TODO: using log4net;
+    private static readonly log4net.ILog logger = log4net.LogManager.GetLogger( System.Reflection.MethodBase.GetCurrentMethod().DeclaringType );
+
+snippet     ifelse
+abbr        if ～ else
+prev_word   '^'
+    if(${1:condition}){
+        //TODO: 実装してください
+        ${2}
+    }
+    else {
+        //TODO: 実装してください
+        ${3}
+    }
+
+    ${4}
+
+snippet     if
+abbr        if
+prev_word   '^'
+    if(${1:condition}){
+        //TODO: 実装してください
+        ${2}
+    }
+
+    ${4}
+
+snippet     methodi
+abbr        int method()
+prev_word   '^'
+    public int ${1:methodname}(${2:condition}){
+        int result = 0;
+
+        //TODO: 実装してください
+        ${3}
+        //TODO: result = 1;
+
+        return result;
+    }
+
+    ${4}
+
+snippet     methodb
+abbr        bool method()
+prev_word   '^'
+    public bool ${1:methodname}(${2:condition}){
+        bool result = false;
+
+        //TODO: 実装してください
+        ${3}
+        //TODO: result = true;
+
+        return result;
+    }
+
+    ${4}
+
+snippet     methods
+abbr        string method()
+prev_word   '^'
+    public string ${1:methodname}(${2:condition}){
+        string result = "";
+
+        //TODO: 実装してください
+        ${3}
+
+        return result;
+    }
+
+    ${4}
+
+snippet     foreach 
+abbr        foreach()
+prev_word   '^'
+    foreach(var ${1:line} in ${2:lines}){
+        //TODO: 実装してください
+        ${3}${1:line}
+    }
+
+    ${4}
+
+snippet     dictionary
+abbr        Dictionary foreach
+prev_word   '^'
+    var ${1:myDict} = new Dictionary<${2:string}, ${3:string}>();
+
+    //TODO: 追加
+    ${1:myDict}.Add("hello", "こんにちわ");
+
+    //TODO: インデクサによる値の取得
+    string ans = ${1:myDict}["hello"];
+
+    // 各要素の列挙
+    foreach (KeyValuePair<${2:string}, ${3:string}> ${4:pair} in ${1:myDict}) {
+      //TODO: 実装してください
+      Console.WriteLine("{0}:{1}", ${4:pair}.Key, ${4:pair}.Value);
+    }
+
+snippet     xml
+abbr        xmlDocument でXmlファイルから値を読み出す
+prev_word   '^'
+    //todo:using System.Xml;
+    //todo:using Rohinomiya;
+
+    string settingFilePath = RohinomiyaCommon.GetMyXmlPath();
+
+    XmlDocument xml = new XmlDocument();
+    xml.Load(settingFilePath);
+    
+    //todo:実装してください
+    string dummy;
+    dummy=xml.GetElementsByTagName("hogehogeId")[0].InnerText;
+
+snippet     appconfig
+abbr        app.config の<appconfig>セクションから設定値を読み込む
+prev_word   '^'
+    // TODO: System.Configuration.dll への参照設定が必要
+    // TODO: using System.Configuration;
+
+    // TODO:実装してください 
+    string userID = ConfigurationManager.AppSettings["Setting1"];
+            
+snippet     split
+abbr        String.split で、文字列を与えて分割する
+prev_word   '^'
+    string[] ${1:separators} = new string[] { ${2:"\t"} };
+    string[] ${3:columns} = ${4:line}.Split( ${1:separators}, StringSplitOptions.RemoveEmptyEntries );
+
+snippet     urldecode
+abbr        文字列をUrldecodeする
+prev_word   '^'
+    //TODO:「.NET」タブ 内の 「System.Web」の参照を追加
+    //TODO: using System.Web.HttpUtility;
+    //TODO: using System.Text;
+    string ${1:decoded};
+	${1:decoded} = UrlEncode(${2:name}, Encoding.GetEncoding("${3:shift_jis}"));            
+
+snippet     writeline
+abbr        WriteLine 標準出力にメッセージを出力する
+prev_word   '^'
+    Console.WriteLine(${1:msg});
+
+snippet     nunit
+abbr        NUnit の準備をする
+prev_word   '^'
+    //TODO: ↓参照設定を追加して
+    //TODO: using NUnit.Framework;
+    //TODO: [Test]属性の付いた
+
+    [SetUp]
+    public void Setup()
+    {
+        //TODO: 前処理を記述してください
+
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        //TODO: 前処理を記述してください
+
+    }
+
+snippet     test
+abbr        NUnitテスト用のメソッドを追加
+prev_word   '^'
+    [Test]
+    public void ${1:MethodName}Test()
+    {
+        // TODO: Add your test.
+        Assert.${2:IsTrue}
+    }
+
+snippet     process
+abbr        Process で、子プロセスを実行して、標準出力を取得する
+prev_word   '^'
+    //TODO: using System.Diagnostics;
+
+    ProcessStartInfo psi = new ProcessStartInfo();
+
+    psi.FileName = ${1}System.Environment.GetEnvironmentVariable("ComSpec");
+    psi.Arguments = ${2}@"/c dir c:\ /w";
+    psi.CreateNoWindow = true;
+    psi.UseShellExecute = false;
+    psi.RedirectStandardInput = false;
+    psi.RedirectStandardOutput = true;
+
+    Process p = Process.Start(psi);
+    string results = p.StandardOutput.ReadToEnd();
+    //WaitForExitはReadToEndの後である必要がある
+    //(親プロセス、子プロセスでブロック防止のため)
+    p.WaitForExit();
+
+    fileList = results;
+
+snippet     escape
+abbr        ダブルクォートをエスケープする場合は、\" と記述する
+prev_word   '^'
+    //TODO: ダブルクォートをエスケープする場合は、\" と記述する
+
+snippet     extension
+abbr        Path.GetExtension()
+prev_word   '^'
+    ${1:fileExtension} = Path.GetExtension(${2:filePath});
+    ${3}
+
+snippet     regexmatch
+abbr        Regex 正規表現による文字列検索
+prev_word   '^'
+    //using System.Text;
+    //using System.Text.RegularExpressions;
+    
+    Regex r;
+    Matches ms;
+
+    r = new Regex(${1:pattern}, RegexOptions.IgnoreCase | RegexOptions.Compiled );
+    ms = r.Matches( ${2:Text});
+
+    foreach (Match m in ms){
+        for (int i = 0; i < m.Groups.Count; i++) {
+        //TODO: 実装してください
+            Console.WriteLine("グループ{0}:{1}", i, m.Groups[i]);
+            for (int l = 0; l < m.Groups[i].Captures.Count; l++) {
+                Console.WriteLine(" キャプチャ{0}:{1}", l, m.Groups[i].Captures[l].Value);
+            }
+        }
+    }
+
+snippet     stringarrayinit
+abbr        文字列配列 宣言＋初期化の例
+prev_word   '^'
+    string[] ${1:separators} = new string[] { ${2:values} };
+
+snippet     include
+abbr        文字列が含まれているかどうかを判定
+prev_word   '^'
+    //TODO: using Rohinomiya;
+
+    public static bool IncludeWord(string Text, string searchWord) {
+        return (0 <= Text.IndexOf(searchWord));
+    }
+
+    if( RohinomiyaCommon.IncludeWord(Text, searchText) ){
+        //TODO: 実装してください
+    }
+    else {
+        //TODO: 実装してください
+    }
+
+
+snippet     indexof
+abbr        文字列を検索し、見つかった位置を返す(失敗=-1)
+prev_word   '^'
+    //TODO: using Rohinomiya;
+
+    int pos;
+    ${1:pos} = ${2:Text}.IndexOf(${3:searchWord}));
+
+snippet     processexit
+abbr        Process_Exitイベントハンドラ
+prev_word   '^'
+    // プロセスの終了を捕捉する Exited イベントハンドラ
+    private void Process_Exited(object sender, EventArgs e )
+    {
+        System.Diagnostics.Process p = (System.Diagnostics.Process)sender;
+        MessageBox.Show("プロセスが終了しました。プロセスID：" + p.Id.ToString());
+    }        
+
+snippet     enum
+abbr        enum 列挙体 ～ ビット演算あり
+prev_word   '^'
+    [FlagsAttribute]
+    public enum Attributes {
+        //TODO: not implemented.
+        None =0,
+        System=1,
+        Hidden2,
+        Archive=4,
+        Directory=8
+    };
+
+    Attributes attr = Attributes.Directory;
+
+    attr |= Attributes.Hidden;
+    if ((attr & Attributes.Directory) == Attributes.Directory)
+    {
+        //TODO: not implemented.
+    }
+
+snippet     base
+abbr        クラス継承時に、親クラスにアクセスする際には this ではなく base を使う
+prev_word   '^'
+    base.${1}
+
+snippet     this
+abbr        クラス内で、自分自身にアクセスする際には this を使う
+prev_word   '^'
+    this.${1}
+

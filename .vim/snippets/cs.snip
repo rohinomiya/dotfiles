@@ -216,6 +216,7 @@ prev_word   '^'
     //WaitForExitはReadToEndの後である必要がある
     //(親プロセス、子プロセスでブロック防止のため)
     p.WaitForExit();
+    //p.ExitCode
 
     fileList = results;
 

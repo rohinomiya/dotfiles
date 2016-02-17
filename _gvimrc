@@ -1,0 +1,47 @@
+"set encoding=utf-8
+"scriptencoding utf-8
+
+" my _gvimrc (read after gvimrc)
+
+" Last Change: 2016/02/04 22:45:28.
+" Maintainer:  rohinomiya <rohinomiya@gmail.com>
+
+" 検索文字列をハイライトしない
+" set nohlsearch
+
+" コメントだけ色を薄くする
+" ctermfg はターミナルの、guifg は GUI 版の Vim の前景色
+" 太字にしたい場合は cterm=BOLD gui=BOLD などのように設定出来ます。
+autocmd ColorScheme * highlight Comment ctermfg=247 cterm=bold guifg=#7f7f7f gui=bold
+
+" カラースキーム
+" colorscheme molokai
+" colorscheme jellybeans
+colorscheme badwolf
+
+"gVim でウィンドウの位置とサイズを記憶する
+"http://vim-jp.org/vim-users-jp/2010/01/28/Hack-120.html
+let g:save_window_file = expand('~/.vimwinpos')
+augroup SaveWindow
+  autocmd!
+  autocmd VimLeavePre * call s:save_window()
+  function! s:save_window()
+    let options = [
+      \ 'set columns=' . &columns,
+      \ 'set lines=' . &lines,
+      \ 'winpos ' . getwinposx() . ' ' . getwinposy(),
+      \ ]
+    call writefile(options, g:save_window_file)
+  endfunction
+augroup END
+
+if filereadable(g:save_window_file)
+  execute 'source' g:save_window_file
+endif
+
+" フォント
+if has('win32') || has('win64')
+  set guifont=Myrica\ M:h16
+  " set guifont=MigMix\ 1M:h14
+  set renderoptions=type:directx,renmode:5  "DirectXで描画
+endif

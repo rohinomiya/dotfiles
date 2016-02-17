@@ -1,0 +1,30 @@
+# Global snippets
+
+snippet     todo
+    //TODO: ${1:describe_here}
+    {0}
+
+snippet     name
+abbr        sonic-template:the filename without extension.
+    {{_name_}}
+
+snippet     cursor
+abbr        sonic-template:cursor position.
+    {{_cursor_}}
+
+snippet     inputvar
+abbr        sonic-template:ask the value of "var".
+    {{_input_:var}}
+
+snippet     expr
+abbr        sonic-template:expression in vimscript.
+    {{_expr_:xxx}}
+
+snippet     currenttime
+abbr        sonic-template:insert current time
+    {{_expr_:strftime('%c')}}
+
+snippet     ifexpr
+abbr        sonic-template:insert if expr
+    {{_if_:strftime('%w')%6;OrdinaryDay;Holiday}}
+

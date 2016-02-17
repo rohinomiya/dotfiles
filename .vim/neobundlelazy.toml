@@ -1,0 +1,53 @@
+# [[plugins]]
+# repo = 'Shougo/neosnippet.vim'
+# depends = ['Shougo/neosnippet-snippets', 'Shougo/context_filetype.vim']
+# on_i = 1
+# on_unite = [ 'neosnippet', 'neosnippet/user', 'neosnippet/runtime']
+
+[[plugins]]
+repo = 'fatih/vim-go'
+filetypes = 'go'
+
+[[plugins]]
+repo = 'Shougo/vimfiler'
+explorer = 1
+on_map = '<Plug>'
+
+[[plugins]]
+repo = 'majutsushi/tagbar'
+on_map = '<Plug>'
+
+[[plugins]]
+repo = 'thinca/vim-quickrun'
+on_map = '<Plug>'
+
+[[plugins]]
+repo = 'rking/ag.vim'
+on_map = '<Plug>'
+
+[[plugins]]
+repo = 'Shougo/unite.vim'
+depends = 'Shougo/neomru.vim'
+on_cmd = 'Unite'
+
+[[plugins]]
+repo = 'Shougo/vimshell.vim'
+on_cmd = ['VimShellBufferDir', 'VimShell']
+
+# [[plugins]]
+# repo = 'vim-jp/vim-go-extra'
+# filetype = 'go'
+
+# [[plugins]]
+# repository = 'dgryski/vim-godef'
+# filetypes = 'go'
+
+# [[plugins]]
+# repository = 'cespare/vim-toml'
+# filetypes = 'toml'
+
+# [[plugins]]
+# repo = 'Shougo/neopairs.vim'
+# on_i = 1
+
+

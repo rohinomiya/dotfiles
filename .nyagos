@@ -1,0 +1,136 @@
+-- .nyagos
+
+-- suffix
+-- open .lua by nyagos (not need lua.exe)
+suffix.lua={"nyagos.exe","-f"}
+
+-- TODO: 重複した記述をすっきりまとめて
+
+-- prompt
+local prompter=nyagos.prompt
+nyagos.prompt = function(this)
+    return prompter('$e[36;40;1m'..this..'$e[37;1m')
+end
+
+set {
+    PROMPT='[$P]$_$$ '
+}
+
+-- filter
+-- "$PATH" 表記で環境変数を展開する
+local _filter = nyagos.filter
+nyagos.filter = function(cmdline)
+  local post = cmdline:gsub('${([%w_()]+)}', '%%%1%%')
+  post = post:gsub('$([%w_()]+)', '%%%1%%')
+  return _filter(post)
+end
+
+-- key binding
+-- CTRL+S でpecoでスニペットを開いて実行
+nyagos.bindkey("C_S",
+	function(this)
+        local cmd = get_command_peco()
+        if (cmd == nil) then
+            return false
+        end
+
+        -- nyagos.exec(cmd)
+        return cmd
+	end
+)
+
+-- alias
+nyagos.alias.cinst = "cinst -y"
+nyagos.alias.ll = "ls -ol"
+nyagos.alias.t = "twty"
+nyagos.alias.e = "edit.exe"
+nyagos.alias.v = "view.exe"
+
+alias {
+	-- pecoでスニペットを開いて実行
+    psnippet = function ()
+        local cmd = get_command_peco()
+        if (cmd == nil) then
+            return false
+        end
+
+        -- nyagos.exec(cmd)
+        -- いきなり実行する（一旦編集を挟む手段はない）
+        return cmd
+    end
+}
+
+alias {
+	-- ディレクトリ移動
+	-- code from 'http://lua-users.org/wiki/SplitJoin'
+    pcd = function (args)
+        local dir_list = '~/.peco-cd'
+        --TODO: ちゃんと引数が"edit"かどうか判別して
+        if #args >= 1 then
+            nyagos.exec('vim ~/.peco-cd')
+            return
+        end
+
+        local dir = nyagos.eval('peco ~/.peco-cd')
+        if (dir ~= nil) then
+            nyagos.exec('cd ' .. '"' .. chomp(dir) .. '"')
+        end
+    end
+}
+
+function get_command_peco()
+    local cmd = nyagos.eval("peco ~/.snippets")
+    cmd = cmd:gsub("^%[.-%]%s+", "") -- delete head comment
+    --TODO:もっとすっきりまとめられない？
+    if (cmd == nil) then
+    	return nil
+    end
+
+	cmd = chomp(cmd)
+    if (cmd == nil) then
+    	return nil
+    end
+
+	-- TODO: グループ化＆選択 の正規表現を使ってすっきりまとめて（少し調べたがわからなかった）
+	if string.match(string.lower(cmd),"^%w+%.cpl") then
+		cmd = "start " .. cmd
+	elseif string.match(string.lower(cmd),"^https:") then
+		cmd = "start " .. cmd
+	elseif string.match(string.lower(cmd),"^http:") then
+		cmd = "start " .. cmd
+	elseif string.match(string.lower(cmd),"^shell:") then
+		cmd = "start " .. cmd
+	end
+	
+    return cmd
+end
+
+
+function exec_command(cmd)
+end
+
+
+-- code from 'http://lua-users.org/wiki/SplitJoin'
+function split(str, pat)
+    local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+    local fpat = "(.-)" .. pat
+    local last_end = 1
+    local s, e, cap = str:find(fpat, 1)
+    while s do
+        if s ~= 1 or cap ~= "" then
+            table.insert(t,cap)
+        end
+        last_end = e+1
+        s, e, cap = str:find(fpat, last_end)
+    end
+    if last_end <= #str then
+        cap = str:sub(last_end)
+        table.insert(t, cap)
+    end
+    return t
+end
+
+-- code from 'https://www.snip2code.com/Snippet/167972/nyagos-peco---------------'
+function chomp(src)
+    return string.gsub(src, "[\r\n]+$", "")
+end
